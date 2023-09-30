@@ -1,0 +1,22 @@
+{
+    "name": "celionatti/nattipress",
+    "description": "Mini PHP Framework with Plugins",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Celionatti\\Nattipress\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "celionatti",
+            "email": "amisuusman@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "symfony/var-dumper": "^6.3",
+        "vlucas/phpdotenv": "^5.5"
+    }
+}
