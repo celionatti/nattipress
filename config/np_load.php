@@ -62,15 +62,8 @@ if (file_exists(ABSPATH . 'config/np_config.php')) {
 
     require_once ABSPATH . NPSET . '/functions.php';
 
-    $path = np_guess_url() . '/wp-admin/setup-config.php';
 
-    // Redirect to setup-config.php.
-    if (false === strpos($_SERVER['REQUEST_URI'], 'setup-config')) {
-        header('Location: ' . $path);
-        exit;
-    }
-
-    define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
+    define('NP_PLUGIN_DIR', ABSPATH . 'themes');
     require_once ABSPATH . NPSET . '/version.php';
 
     np_check_php_versions();
