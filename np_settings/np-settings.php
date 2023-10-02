@@ -32,7 +32,7 @@ define( 'NPSET', 'np_settings' );
  * @global string $required_mysql_version The required MySQL version string.
  * @global string $np_local_package       Locale code of the package.
  */
-global $np_version, $np_db_version, $tinymce_version, $required_php_version, $required_mysql_version, $np_local_package;
+global $np_version, $np_db_version, $tinymce_version, $required_php_version, $required_mysql_version, $np_local_package, $np_actions, $np_filters, $np_app;
 require ABSPATH . NPSET . '/version.php';
 require ABSPATH . NPSET . '/load.php';
 require_once ABSPATH . NPSET . '/np-functions.php';
@@ -42,6 +42,7 @@ np_check_php_versions();
 
 // Include files required for initialization.
 require ABSPATH . NPSET . '/default-constants.php';
+require ABSPATH . NATTICORE . '/global-variables.php';
 
 /**
  * If not already configured, `$blog_id` will default to 1 in a single site

@@ -98,6 +98,8 @@ define( 'NP_THEMES', "" );
 
 define( 'NP_THEMES_URL', "" );
 
+define( 'NP_ROOT', "nattipress.test" );
+
 
 /* That's all, stop editing! Happy publishing. */
 
