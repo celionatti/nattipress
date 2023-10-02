@@ -200,7 +200,7 @@ function np_die($value, $message = '', $title = 'NattiPress Error', $status_code
         <title>{$title}</title>
         <style>
             body {font-family: Arial, sans-serif;}
-            .error-container {background-color: #F8F8F8; border: 1px solid #E0E0E0; margin: 20px; padding: 20px;}
+            .error-container {background-color: #F8F8F8; border: 1px solid #E0E0E0; margin: 20px; padding: 20px; text-align:center;}
             .error-title {font-size: 24px; color: #FF0000; font-weight: bold; margin-bottom: 10px;}
             .error-message {font-size: 18px; color: #333; margin-bottom: 20px;}
             .error-details {font-size: 16px; color: #777;}
@@ -253,4 +253,29 @@ function URL($key = '')
 
     // Return an empty string if the URL key is not found
     return '';
+}
+
+function redirect($url, $status_code = 302, $headers = [], $query_params = [], $exit = true)
+{
+    // Ensure a valid HTTP status code is used
+    if (!in_array($status_code, [301, 302, 303, 307, 308])) {
+        $status_code = 302; // Default to a temporary (302) redirect
+    }
+
+    // Build the query string from the provided query parameters
+    $query_string = !empty($query_params) ? '?' . http_build_query($query_params) : '';
+
+    // Prepare and set custom headers
+    $headers['Location'] = $url . $query_string;
+    $headers['Status'] = $status_code . ' ' . http_response_code($status_code);
+
+    // Send headers
+    foreach ($headers as $key => $value) {
+        header($key . ': ' . $value, true);
+    }
+
+    // Optionally exit to prevent further script execution
+    if ($exit) {
+        exit();
+    }
 }

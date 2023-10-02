@@ -1,3 +1,3 @@
 <?php
 
-echo "Admin Auth Plugin";
+declare(strict_types=1);

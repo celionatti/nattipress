@@ -6,6 +6,82 @@ declare(strict_types=1);
  * 
  */
 
+ function set_value(string|array $key, mixed $value = ''): bool {
+    global $np_data;
+
+    $called_from = debug_backtrace();
+    $ikey = array_search(__FUNCTION__, array_column($called_from, 'function'));
+    $path = get_plugin_dir(debug_backtrace()[$ikey]['file']) . 'config.json';
+
+    if (file_exists($path)) {
+        $json = json_decode(file_get_contents($path));
+        $plugin_id = $json->id;
+
+        // Ensure $np_data[$plugin_id] is initialized as an array
+        if (!isset($np_data[$plugin_id]) || !is_array($np_data[$plugin_id])) {
+            $np_data[$plugin_id] = [];
+        }
+
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $np_data[$plugin_id][$k] = $v;
+            }
+        } else {
+            $np_data[$plugin_id][$key] = $value;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+function get_value(string $key = ''): mixed {
+    global $np_data;
+
+    $called_from = debug_backtrace();
+    $ikey = array_search(__FUNCTION__, array_column($called_from, 'function'));
+    $path = get_plugin_dir(debug_backtrace()[$ikey]['file']) . 'config.json';
+
+    if (file_exists($path)) {
+        $json = json_decode(file_get_contents($path));
+        $plugin_id = $json->id;
+
+        if (empty($key)) {
+            return $np_data[$plugin_id] ?? null;
+        }
+
+        $value = $np_data[$plugin_id][$key] ?? null;
+        return $value;
+    }
+
+    return null;
+}
+
+function save_user_data_to_config($user_data, $config_path) {
+    // Optionally, you can implement a function to save the $user_data array to the config file.
+    // This allows you to persist the data between script executions.
+    // Make sure to handle file locking and JSON encoding properly.
+
+    // Encode the user data as JSON
+    $json_data = json_encode($user_data, JSON_PRETTY_PRINT);
+
+    if ($json_data === false) {
+        // Handle JSON encoding error, e.g., log an error message
+        error_log('Failed to encode user data to JSON.');
+        return;
+    }
+
+    // Write the JSON data to the config file
+    $result = file_put_contents($config_path, $json_data);
+
+    if ($result === false) {
+        // Handle file write error, e.g., log an error message
+        error_log('Failed to write user data to the config file.');
+    }
+}
+
+
 function get_plugin_folders($plugins_folder = 'themes/')
 {
     $res = [];
@@ -197,4 +273,48 @@ function do_filter(string $hook, $data = '')
     }
 
     return $data;
+}
+
+
+function get_plugin_dir(string $filepath): string {
+    // Get the directory path of the provided file
+    $directory = dirname($filepath);
+
+    // Define the expected directory structure for plugins
+    $pluginsDirectory = 'themes' . DIRECTORY_SEPARATOR;
+
+    // Check if the path contains the plugins directory
+    if (strpos($directory, $pluginsDirectory) !== false) {
+        // Split the path using the plugins directory as a delimiter
+        $parts = explode($pluginsDirectory, $directory, 2);
+
+        // Ensure the expected structure is found
+        if (count($parts) === 2) {
+            // Extract the plugin folder name
+            $pluginFolder = strtok($parts[1], DIRECTORY_SEPARATOR);
+
+            // Reconstruct the plugin directory path
+            $pluginDirPath = ABSPATH . $pluginsDirectory . $pluginFolder . DIRECTORY_SEPARATOR;
+
+            return $pluginDirPath;
+        }
+    }
+
+    // If the expected structure is not found, return an empty string or handle the error as needed
+    return '';
+}
+
+function plugin_path(string $path = '')
+{
+	$called_from = debug_backtrace();
+	$key = array_search(__FUNCTION__, array_column($called_from, 'function'));
+	return get_plugin_dir(debug_backtrace()[$key]['file']) . $path;
+}
+
+function plugin_http_path(string $path = '')
+{
+	$called_from = debug_backtrace();
+	$key = array_search(__FUNCTION__, array_column($called_from, 'function'));
+	
+	return NP_ROOT . DIRECTORY_SEPARATOR . get_plugin_dir(debug_backtrace()[$key]['file']) . $path;
 }

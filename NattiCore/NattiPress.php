@@ -31,6 +31,28 @@ class NattiPress
 
     public function run()
     {
-        // echo $this->router->resolve();
+        $this->indexing();
+    }
+
+    private function indexing()
+    {
+        do_action('before_controller');
+        do_action('controller');
+        do_action('after_controller');
+
+        ob_start();
+        do_action('before_view');
+
+        $before_content = ob_get_contents();
+        do_action('view');
+        $after_content = ob_get_contents();
+
+        if (strlen($after_content) == strlen($before_content)) {
+            if (page() != 'not-found') {
+                redirect('not-found');
+            }
+        }
+
+        do_action('after_view');
     }
 }
