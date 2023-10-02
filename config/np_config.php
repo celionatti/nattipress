@@ -82,20 +82,29 @@ $table_prefix = 'np_';
  *
  * @link https://nattipress.org/documentation/article/debugging-in-nattipress/
  */
-define( 'WP_DEBUG', false );
+define( 'NP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
 define('NP_ENVIRONMENT_TYPE', 'development');
 
+define( 'NP_DEBUG_DISPLAY', null );
+
+define( 'NP_DEBUG_LOG', true );
+
+define( 'SCRIPT_DEBUG', true );
+
+define( 'NP_THEMES', "" );
+
+define( 'NP_THEMES_URL', "" );
 
 
 /* That's all, stop editing! Happy publishing. */
 
-/** Absolute path to the WordPress directory. */
+/** Absolute path to the NattiPress directory. */
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', dirname(__DIR__) . '/' );
 }
 
 /** Sets up NattiPress vars and included files. */
-require_once ABSPATH . 'np_settings/settings.php';
+require_once ABSPATH . 'np_settings/np-settings.php';

@@ -92,7 +92,7 @@ function np_fix_server_vars()
 		$PHP_SELF            = $_SERVER['PHP_SELF'];
 	}
 
-	wp_populate_basic_auth_from_authorization_header();
+	np_populate_basic_auth_from_authorization_header();
 }
 
 /**
@@ -104,7 +104,7 @@ function np_fix_server_vars()
  *
  * @since 1.0.0
  */
-function wp_populate_basic_auth_from_authorization_header()
+function np_populate_basic_auth_from_authorization_header()
 {
 	// If we don't have anything to pull from, return early.
 	if (!isset($_SERVER['HTTP_AUTHORIZATION']) && !isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
@@ -145,11 +145,11 @@ function wp_populate_basic_auth_from_authorization_header()
  * @access private
  *
  * @global string $required_php_version The required PHP version string.
- * @global string $wp_version           The WordPress version string.
+ * @global string $np_version           The NattiPress version string.
  */
 function np_check_php_versions()
 {
-	global $required_php_version, $wp_version;
+	global $required_php_version, $np_version;
 	$php_version = PHP_VERSION;
 
 	if (version_compare($required_php_version, $php_version, '>')) {
@@ -159,7 +159,7 @@ function np_check_php_versions()
 		printf(
 			'Your server is running PHP version %1$s but NattiPress %2$s requires at least %3$s.',
 			$php_version,
-			$wp_version,
+			$np_version,
 			$required_php_version
 		);
 		exit(1);
@@ -169,7 +169,7 @@ function np_check_php_versions()
 /**
  * Retrieves the current environment type.
  *
- * The type can be set via the `WP_ENVIRONMENT_TYPE` global system variable,
+ * The type can be set via the `NP_ENVIRONMENT_TYPE` global system variable,
  * or a constant of the same name.
  *
  * Possible values are 'local', 'development', 'staging', and 'production'.
@@ -236,7 +236,7 @@ function np_get_environment_type()
  * @since 3.0.0
  * @deprecated 5.4.0 Deprecated in favor of do_favicon().
  */
-function wp_favicon_request()
+function np_favicon_request()
 {
 	if ('/favicon.ico' === $_SERVER['REQUEST_URI']) {
 		header('Content-Type: image/vnd.microsoft.icon');
@@ -298,4 +298,66 @@ function timer_start()
 	global $timestart;
 	$timestart = microtime(true);
 	return true;
+}
+
+/**
+ * Converts a shorthand byte value to an integer byte value.
+ *
+ * @since 2.3.0
+ * @since 4.6.0 Moved from media.php to load.php.
+ *
+ * @link https://www.php.net/manual/en/function.ini-get.php
+ * @link https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
+ *
+ * @param string $value A (PHP ini) byte value, either shorthand or ordinary.
+ * @return int An integer byte value.
+ */
+function np_convert_hr_to_bytes( $value ) {
+	$value = strtolower( trim( $value ) );
+	$bytes = (int) $value;
+
+	if ( false !== strpos( $value, 'g' ) ) {
+		$bytes *= GB_IN_BYTES;
+	} elseif ( false !== strpos( $value, 'm' ) ) {
+		$bytes *= MB_IN_BYTES;
+	} elseif ( false !== strpos( $value, 'k' ) ) {
+		$bytes *= KB_IN_BYTES;
+	}
+
+	// Deal with large (float) values which run into the maximum integer size.
+	return min( $bytes, PHP_INT_MAX );
+}
+
+/**
+ * Determines whether a PHP ini value is changeable at runtime.
+ *
+ * @since 4.6.0
+ *
+ * @link https://www.php.net/manual/en/function.ini-get-all.php
+ *
+ * @param string $setting The name of the ini setting to check.
+ * @return bool True if the value is changeable at runtime. False otherwise.
+ */
+function np_is_ini_value_changeable( $setting ) {
+	static $ini_all;
+
+	if ( ! isset( $ini_all ) ) {
+		$ini_all = false;
+		// Sometimes `ini_get_all()` is disabled via the `disable_functions` option for "security purposes".
+		if ( function_exists( 'ini_get_all' ) ) {
+			$ini_all = ini_get_all();
+		}
+	}
+
+	// Bit operator to workaround https://bugs.php.net/bug.php?id=44936 which changes access level to 63 in PHP 5.2.6 - 5.2.17.
+	if ( isset( $ini_all[ $setting ]['access'] ) && ( INI_ALL === ( $ini_all[ $setting ]['access'] & 7 ) || INI_USER === ( $ini_all[ $setting ]['access'] & 7 ) ) ) {
+		return true;
+	}
+
+	// If we were unable to retrieve the details, fail gracefully to assume it's changeable.
+	if ( ! is_array( $ini_all ) ) {
+		return true;
+	}
+
+	return false;
 }

@@ -21,7 +21,7 @@ declare(strict_types=1);
  * @global string $np_version The NattiPress version string.
  */
 function np_initial_constants() {
-	global $blog_id, $np_version;
+	global $blog_id, $np_version, $npdb;
 
 	/**#@+
 	 * Constants for expressing human-readable data sizes in their respective number of bytes.
@@ -40,49 +40,51 @@ function np_initial_constants() {
 	/**#@-*/
 
 	// Start of run timestamp.
-	if ( ! defined( 'WP_START_TIMESTAMP' ) ) {
-		define( 'WP_START_TIMESTAMP', microtime( true ) );
+	if ( ! defined( 'NP_START_TIMESTAMP' ) ) {
+		define( 'NP_START_TIMESTAMP', microtime( true ) );
 	}
 
 	$current_limit     = ini_get( 'memory_limit' );
-	$current_limit_int = wp_convert_hr_to_bytes( $current_limit );
+	$current_limit_int = np_convert_hr_to_bytes( $current_limit );
 
 	// Define memory limits.
-	// if ( ! defined( 'NP_MEMORY_LIMIT' ) ) {
-	// 	if ( false === np_is_ini_value_changeable( 'memory_limit' ) ) {
-	// 		define( 'NP_MEMORY_LIMIT', $current_limit );
-	// 	} elseif ( is_multisite() ) {
-	// 		define( 'NP_MEMORY_LIMIT', '64M' );
-	// 	} else {
-	// 		define( 'NP_MEMORY_LIMIT', '40M' );
-	// 	}
-	// }
+	if ( ! defined( 'NP_MEMORY_LIMIT' ) ) {
+		if ( false === np_is_ini_value_changeable( 'memory_limit' ) ) {
+			define( 'NP_MEMORY_LIMIT', $current_limit );
+		} else {
+			define( 'NP_MEMORY_LIMIT', '40M' );
+		}
+	}
 
-	// if ( ! defined( 'NP_MAX_MEMORY_LIMIT' ) ) {
-	// 	if ( false === wp_is_ini_value_changeable( 'memory_limit' ) ) {
-	// 		define( 'NP_MAX_MEMORY_LIMIT', $current_limit );
-	// 	} elseif ( -1 === $current_limit_int || $current_limit_int > 268435456 /* = 256M */ ) {
-	// 		define( 'NP_MAX_MEMORY_LIMIT', $current_limit );
-	// 	} else {
-	// 		define( 'NP_MAX_MEMORY_LIMIT', '256M' );
-	// 	}
-	// }
+	if ( ! defined( 'NP_MAX_MEMORY_LIMIT' ) ) {
+		if ( false === np_is_ini_value_changeable( 'memory_limit' ) ) {
+			define( 'NP_MAX_MEMORY_LIMIT', $current_limit );
+		} elseif ( -1 === $current_limit_int || $current_limit_int > 268435456 /* = 256M */ ) {
+			define( 'NP_MAX_MEMORY_LIMIT', $current_limit );
+		} else {
+			define( 'NP_MAX_MEMORY_LIMIT', '256M' );
+		}
+	}
 
 	// Set memory limits.
-	// $wp_limit_int = wp_convert_hr_to_bytes( NP_MEMORY_LIMIT );
-	// if ( -1 !== $current_limit_int && ( -1 === $wp_limit_int || $wp_limit_int > $current_limit_int ) ) {
-	// 	ini_set( 'memory_limit', NP_MEMORY_LIMIT );
-	// }
+	$wp_limit_int = np_convert_hr_to_bytes( NP_MEMORY_LIMIT );
+	if ( -1 !== $current_limit_int && ( -1 === $wp_limit_int || $wp_limit_int > $current_limit_int ) ) {
+		ini_set( 'memory_limit', NP_MEMORY_LIMIT );
+	}
 
 	if ( ! isset( $blog_id ) ) {
 		$blog_id = 1;
 	}
 
-	if ( ! defined( 'NP_THEMES' ) ) {
-		define( 'NP_THEMES', ABSPATH . 'themes' ); // No trailing slash, full paths only - WP_CONTENT_URL is defined further down.
+	if ( ! defined( 'NP_SITEURL' ) ) {
+		define( 'NP_SITEURL', getenv("SITEURL") ); // No trailing slash, full paths only - NP_SITEURL is defined further down.
 	}
 
-	// Add define( 'WP_DEBUG', true ); to wp-config.php to enable display of notices during development.
+	if ( ! defined( 'NP_THEMES' ) ) {
+		define( 'NP_THEMES', ABSPATH . 'themes' ); // No trailing slash, full paths only - NP_THEMES is defined further down.
+	}
+
+	// Add define( 'NP_DEBUG', true ); to np_config.php to enable display of notices during development.
 	if ( ! defined( 'NP_DEBUG' ) ) {
 		if ( 'development' === np_get_environment_type() ) {
 			define( 'NP_DEBUG', true );
@@ -91,13 +93,13 @@ function np_initial_constants() {
 		}
 	}
 
-	// Add define( 'WP_DEBUG_DISPLAY', null ); to wp-config.php to use the globally configured setting
+	// Add define( 'NP_DEBUG_DISPLAY', null ); to np-config.php to use the globally configured setting
 	// for 'display_errors' and not force errors to be displayed. Use false to force 'display_errors' off.
 	if ( ! defined( 'NP_DEBUG_DISPLAY' ) ) {
 		define( 'NP_DEBUG_DISPLAY', true );
 	}
 
-	// Add define( 'WP_DEBUG_LOG', true ); to enable error logging to wp-content/debug.log.
+	// Add define( 'NP_DEBUG_LOG', true ); to enable error logging to logs/debug.log.
 	if ( ! defined( 'NP_DEBUG_LOG' ) ) {
 		define( 'NP_DEBUG_LOG', false );
 	}
@@ -106,11 +108,11 @@ function np_initial_constants() {
 		define( 'NP_CACHE', false );
 	}
 
-	// Add define( 'SCRIPT_DEBUG', true ); to np-config.php to enable loading of non-minified,
+	// Add define( 'SCRIPT_DEBUG', true ); to np_config.php to enable loading of non-minified,
 	// non-concatenated scripts and stylesheets.
 	if ( ! defined( 'SCRIPT_DEBUG' ) ) {
-		if ( ! empty( $NP_version ) ) {
-			$develop_src = false !== strpos( $NP_version, '-src' );
+		if ( ! empty( $np_version ) ) {
+			$develop_src = false !== strpos( $np_version, '-src' );
 		} else {
 			$develop_src = false;
 		}
@@ -161,9 +163,14 @@ function np_initial_constants() {
  *
  * @since 3.0.0
  */
-function NP_plugin_directory_constants() {
-	if ( ! defined( 'NP_CONTENT_URL' ) ) {
-		define( 'NP_CONTENT_URL', get_option( 'siteurl' ) . '/NP-content' ); // Full URL - NP_CONTENT_DIR is defined further up.
+function np_plugin_directory_constants() {
+	/**
+	 * Allows for the plugins directory to be moved from the default location.
+	 *
+	 * @since 2.6.0
+	 */
+	if ( ! defined( 'NP_THEMES_DIR' ) ) {
+		define( 'NP_THEMES_DIR', NP_THEMES . '/plugins' ); // Full path, no trailing slash.
 	}
 
 	/**
@@ -171,17 +178,8 @@ function NP_plugin_directory_constants() {
 	 *
 	 * @since 2.6.0
 	 */
-	if ( ! defined( 'NP_PLUGIN_DIR' ) ) {
-		define( 'NP_PLUGIN_DIR', NP_THEMES . '/plugins' ); // Full path, no trailing slash.
-	}
-
-	/**
-	 * Allows for the plugins directory to be moved from the default location.
-	 *
-	 * @since 2.6.0
-	 */
-	if ( ! defined( 'NP_PLUGIN_URL' ) ) {
-		define( 'NP_PLUGIN_URL', NP_CONTENT_URL . '/plugins' ); // Full URL, no trailing slash.
+	if ( ! defined( 'NP_THEMES_URL' ) ) {
+		define( 'NP_THEMES_URL', NP_THEMES_URL . '/plugins' ); // Full URL, no trailing slash.
 	}
 
 	/**
@@ -190,36 +188,8 @@ function NP_plugin_directory_constants() {
 	 * @since 2.1.0
 	 * @deprecated
 	 */
-	if ( ! defined( 'PLUGINDIR' ) ) {
-		define( 'PLUGINDIR', 'NP-content/plugins' ); // Relative to ABSPATH. For back compat.
-	}
-
-	/**
-	 * Allows for the mu-plugins directory to be moved from the default location.
-	 *
-	 * @since 2.8.0
-	 */
-	if ( ! defined( 'NPMU_PLUGIN_DIR' ) ) {
-		define( 'NPMU_PLUGIN_DIR', NP_CONTENT_DIR . '/mu-plugins' ); // Full path, no trailing slash.
-	}
-
-	/**
-	 * Allows for the mu-plugins directory to be moved from the default location.
-	 *
-	 * @since 2.8.0
-	 */
-	if ( ! defined( 'NPMU_PLUGIN_URL' ) ) {
-		define( 'NPMU_PLUGIN_URL', NP_CONTENT_URL . '/mu-plugins' ); // Full URL, no trailing slash.
-	}
-
-	/**
-	 * Allows for the mu-plugins directory to be moved from the default location.
-	 *
-	 * @since 2.8.0
-	 * @deprecated
-	 */
-	if ( ! defined( 'MUPLUGINDIR' ) ) {
-		define( 'MUPLUGINDIR', 'NP-content/mu-plugins' ); // Relative to ABSPATH. For back compat.
+	if ( ! defined( 'THEMEDIR' ) ) {
+		define( 'THEMEDIR', '/themes' ); // Relative to ABSPATH. For back compat.
 	}
 }
 
@@ -228,7 +198,7 @@ function NP_plugin_directory_constants() {
  *
  * @since 3.0.0
  */
-function NP_functionality_constants() {
+function np_functionality_constants() {
 	/**
 	 * @since 2.5.0
 	 */
@@ -260,20 +230,20 @@ function NP_functionality_constants() {
  *
  * @since 3.0.0
  */
-function NP_templating_constants() {
+function np_templating_constants() {
 	/**
 	 * Filesystem path to the current active template directory.
 	 *
 	 * @since 1.0.0
 	 */
-	define( 'TEMPLATEPATH', get_template_directory() );
+	// define( 'TEMPLATEPATH', get_template_directory() );
 
 	/**
 	 * Filesystem path to the current active template stylesheet directory.
 	 *
 	 * @since 1.0.0
 	 */
-	define( 'STYLESHEETPATH', get_stylesheet_directory() );
+	// define( 'STYLESHEETPATH', get_stylesheet_directory() );
 
 	/**
 	 * Slug of the default theme for this installation.

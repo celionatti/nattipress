@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+use NattiPress\NattiCore\NattiPress;
+
+function np()
+{
+	$np = new NattiPress();
+	dd($np);
+
+	// $np->run();
+}
+
 /**
  * Guesses the URL for the site.
  *
@@ -50,3 +60,39 @@ function np_guess_url() {
 
 	return rtrim( $url, '/' );
 }
+
+/**
+ * Check if the option exists in your options store (e.g., an array or database)
+ * For demonstration, let's assume we have an array called $options_store
+ *
+ * @param string $name
+ * @param  $default
+ * @return void
+ */
+function get_option(string $name, $default = null) {
+    global $npopt;
+
+    if (isset($npopt[$name])) {
+        return $npopt[$name];
+    } else {
+        // Return the default value if provided; otherwise, return null
+        return $default;
+    }
+}
+
+/**
+ * Check if the global $npdb object exists (it's available in multisite installations)
+ *
+ * @return boolean
+ */
+function is_multisite() {
+    global $npdb;
+    
+    if (is_object($npdb) && property_exists($npdb, 'siteid')) {
+        return true; // It's a multisite installation
+    } else {
+        return false; // It's a single site installation
+    }
+}
+
+

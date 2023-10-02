@@ -16,8 +16,5 @@ if (!isset($np_did_header)) {
     require_once __DIR__ . '/np_load.php';
 
     // Set up the NattiPress query.
-    // np();
-
-    // Load the theme template.
-    // require_once ABSPATH . WPINC . '/template-loader.php';
+    np();
 }

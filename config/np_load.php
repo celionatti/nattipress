@@ -24,6 +24,11 @@ if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__DIR__) . '/');
 }
 
+/** Define NattiPress as this file's directory */
+if (!defined('NATTICORE')) {
+    define('NATTICORE', 'NattiCore');
+}
+
 /*
  * The error_reporting() function can be disabled in php.ini. On systems where that is the case,
  * it's best to add a dummy function to the np_config.php file, but as this call to the function
@@ -54,17 +59,5 @@ if (file_exists(ABSPATH . 'config/np_config.php')) {
 
     // A config file doesn't exist.
 
-    define('NPSET', 'np_settings');
-    require_once ABSPATH . NPSET . '/load.php';
-
-    // Standardize $_SERVER variables across setups.
-    np_fix_server_vars();
-
-    require_once ABSPATH . NPSET . '/functions.php';
-
-
-    define('NP_PLUGIN_DIR', ABSPATH . 'themes');
-    require_once ABSPATH . NPSET . '/version.php';
-
-    np_check_php_versions();
+    require_once ABSPATH . NATTICORE . '/config-setup.php';
 }
