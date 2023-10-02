@@ -276,6 +276,16 @@ function do_filter(string $hook, $data = '')
 }
 
 
+function plugin_id():string
+{
+	$called_from = debug_backtrace();
+	$ikey = array_search(__FUNCTION__, array_column($called_from, 'function'));
+	$path = get_plugin_dir(debug_backtrace()[$ikey]['file']) . 'config.json';
+
+	$json = json_decode(file_get_contents($path));
+	return $json->id ?? '';
+}
+
 function get_plugin_dir(string $filepath): string {
     // Get the directory path of the provided file
     $directory = dirname($filepath);

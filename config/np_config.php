@@ -34,6 +34,9 @@ define( 'DB_PASSWORD', 'password_here' );
 /** Database hostname */
 define( 'DB_HOST', 'localhost' );
 
+/** Database driver */
+define( 'DB_DRIVER', 'mysql' );
+
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
 
