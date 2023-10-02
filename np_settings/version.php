@@ -5,7 +5,7 @@
  * Contains version information for the current NattiPress release.
  *
  * @package NattiPress
- * @since 1.2.0
+ * @since 1.0.0
  */
 
 /**

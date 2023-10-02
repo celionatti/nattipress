@@ -13,6 +13,8 @@ class NattiPress
 {
     public function __construct()
     {
-        echo "Hello";
+        // Load plugins folders.
+        // Use Server Request_uri
+        //Nattipress Admin Dashboard.
     }
 }
