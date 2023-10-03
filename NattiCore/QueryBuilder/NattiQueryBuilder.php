@@ -47,6 +47,26 @@ class NattiQueryBuilder
         return $this;
     }
 
+    public function insert(array $data)
+    {
+        if (empty($data)) {
+            throw new \InvalidArgumentException('Invalid argument for INSERT method. Data array must not be empty.');
+        }
+
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. INSERT should come before other query building methods.');
+        }
+
+        $columns = implode(', ', array_keys($data));
+        $values = ':' . implode(', :', array_keys($data));
+
+        $this->query = "INSERT INTO $this->table ($columns) VALUES ($values)";
+        $this->bindValues = $data;
+        $this->currentStep = 'insert';
+
+        return $this;
+    }
+
     public function where(array $conditions)
     {
         if ($this->currentStep !== 'select' && $this->currentStep !== 'where') {
@@ -72,6 +92,7 @@ class NattiQueryBuilder
 
         return $this;
     }
+
 
     public function orderBy($column, $direction = 'ASC')
     {
@@ -138,7 +159,7 @@ class NattiQueryBuilder
         if ($type !== 'INNER' && $type !== 'LEFT' && $type !== 'RIGHT' && $type !== 'OUTER') {
             throw new \InvalidArgumentException('Invalid argument for JOIN method. Invalid join type.');
         }
-        
+
         if (!is_string($table) || !is_string($onClause)) {
             throw new \InvalidArgumentException('Invalid arguments for JOIN method.');
         }

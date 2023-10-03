@@ -134,3 +134,25 @@ class QueryBuilder
 
     // Implement query building methods here
 }
+
+
+public function insert(array $data)
+{
+    if (empty($data)) {
+        throw new \InvalidArgumentException('Invalid argument for INSERT method. Data array must not be empty.');
+    }
+
+    if ($this->currentStep !== 'initial') {
+        throw new \Exception('Invalid method order. INSERT should come before other query building methods.');
+    }
+
+    $columns = implode(', ', array_keys($data));
+    $values = ':' . implode(', :', array_keys($data));
+
+    $this->query = "INSERT INTO $this->table ($columns) VALUES ($values)";
+    $this->bindValues = $data;
+    $this->currentStep = 'insert';
+
+    return $this;
+}
+

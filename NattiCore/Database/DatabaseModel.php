@@ -17,9 +17,17 @@ class DatabaseModel extends Database
     protected $db;
     protected $queryBuilder;
 
+    public $order 			= 'desc';
+	public $order_column 	= 'id';
+	public $primary_key 	= 'id';
+
+	public $limit 			= 10;
+	public $offset 			= 0;
+	public $errors 			= [];
+
     public function __construct()
     {
-        $this->db = new Database();
+        $this->db = $this->getInstance();
         $this->queryBuilder = new NattiQueryBuilder($this->db, $this->tableName);
     }
 

@@ -137,6 +137,9 @@ class Database
         $this->has_error = false;
 
         try {
+            // Start a transaction
+            $this->beginTransaction();
+
             $stm = $this->connection->prepare($query);
 
             $result = $stm->execute($data);
@@ -150,7 +153,11 @@ class Database
                     $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
                 }
             }
+            // Commit the transaction if the query was successful
+            $this->commitTransaction();
         } catch (PDOException $e) {
+            // Rollback the transaction on error
+            $this->rollbackTransaction();
             $this->error = $e->getMessage();
             $this->has_error = true;
         }
