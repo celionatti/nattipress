@@ -23,25 +23,25 @@ declare(strict_types=1);
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for NattiPress */
-define( 'DB_NAME', 'database_name_here' );
+define('DB_NAME', 'nattipress');
 
 /** Database username */
-define( 'DB_USER', 'username_here' );
+define('DB_USER', 'root');
 
 /** Database password */
-define( 'DB_PASSWORD', 'password_here' );
+define('DB_PASSWORD', '');
 
 /** Database hostname */
-define( 'DB_HOST', 'localhost' );
+define('DB_HOST', 'localhost');
 
 /** Database driver */
-define( 'DB_DRIVER', 'mysql' );
+define('DB_DRIVER', 'mysql');
 
 /** Database charset to use in creating database tables. */
-define( 'DB_CHARSET', 'utf8' );
+define('DB_CHARSET', 'utf8');
 
 /** The database collate type. Don't change this if in doubt. */
-define( 'DB_COLLATE', '' );
+define('DB_COLLATE', '');
 
 /**#@+
  * Authentication unique keys and salts.
@@ -54,14 +54,14 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         'put your unique phrase here' );
-define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
-define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
-define( 'NONCE_KEY',        'put your unique phrase here' );
-define( 'AUTH_SALT',        'put your unique phrase here' );
-define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
-define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
-define( 'NONCE_SALT',       'put your unique phrase here' );
+define('AUTH_KEY',         'put your unique phrase here');
+define('SECURE_AUTH_KEY',  'put your unique phrase here');
+define('LOGGED_IN_KEY',    'put your unique phrase here');
+define('NONCE_KEY',        'put your unique phrase here');
+define('AUTH_SALT',        'put your unique phrase here');
+define('SECURE_AUTH_SALT', 'put your unique phrase here');
+define('LOGGED_IN_SALT',   'put your unique phrase here');
+define('NONCE_SALT',       'put your unique phrase here');
 
 /**#@-*/
 
@@ -85,30 +85,30 @@ $table_prefix = 'np_';
  *
  * @link https://nattipress.org/documentation/article/debugging-in-nattipress/
  */
-define( 'NP_DEBUG', false );
+define('NP_DEBUG', false);
 
 /* Add any custom values between this line and the "stop editing" line. */
 
 define('NP_ENVIRONMENT_TYPE', 'development');
 
-define( 'NP_DEBUG_DISPLAY', null );
+define('NP_DEBUG_DISPLAY', null);
 
-define( 'NP_DEBUG_LOG', true );
+define('NP_DEBUG_LOG', true);
 
-define( 'SCRIPT_DEBUG', true );
+define('SCRIPT_DEBUG', true);
 
-define( 'NP_THEMES', "" );
+define('NP_THEMES', "");
 
-define( 'NP_THEMES_URL', "" );
+define('NP_THEMES_URL', "");
 
-define( 'NP_ROOT', "" );
+define('NP_ROOT', "");
 
 
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the NattiPress directory. */
-if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', dirname(__DIR__) . '/' );
+if (!defined('ABSPATH')) {
+	define('ABSPATH', dirname(__DIR__) . '/');
 }
 
 /** Sets up NattiPress vars and included files. */

@@ -48,6 +48,9 @@ class Database
         try {
             $con = new PDO($string, $np_vars['DB_USER'], $np_vars['DB_PASSWORD']);
             $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $con->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $con->setAttribute(PDO::ATTR_PERSISTENT, true);
+            $con->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         } catch (PDOException $e) {
 
             np_die("Failed to connect to the database with error ", $e->getMessage());

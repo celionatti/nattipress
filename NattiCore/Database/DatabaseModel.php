@@ -11,9 +11,10 @@ use NattiPress\NattiCore\QueryBuilder\NattiQueryBuilder;
  * Database Model Class
  */
 
-class DatabaseModel extends Database
+ abstract class DatabaseModel extends Database
 {
-    protected $tableName;
+    public string $tableName;
+    abstract public static function tableName(): string;
     protected $db;
     protected $queryBuilder;
 
@@ -28,20 +29,21 @@ class DatabaseModel extends Database
     public function __construct()
     {
         $this->db = $this->getInstance();
-        $this->queryBuilder = new NattiQueryBuilder($this->db, $this->tableName);
+        $this->tableName = static::tableName();
+        $this->queryBuilder = $this->db->queryBuilder($this->tableName);
     }
 
     public function find()
     {
-
+        return $this->queryBuilder
+            ->select();
     }
 
-    public function findById($column = "*", $id)
+    public function findById($id)
     {
         return $this->queryBuilder
-            ->select($column)
-            ->where(['id' => $id])
-            ->get('object');
+            ->select()
+            ->where(['id' => $id]);
     }
 
     public function insert()

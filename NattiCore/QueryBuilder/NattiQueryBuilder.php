@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NattiPress\NattiCore\QueryBuilder;
 
+use NattiPress\NattiCore\Database\Database;
 use PDO;
 use PDOException;
 use NattiPress\NattiCore\Database\DatabaseException;
@@ -33,8 +34,8 @@ class NattiQueryBuilder
             throw new \Exception('Invalid method order. SELECT should come first.');
         }
 
-        if (!is_array($columns) || empty($columns)) {
-            throw new \InvalidArgumentException('Invalid argument for SELECT method.');
+        if (!is_array($columns) && !is_string($columns)) {
+            throw new \InvalidArgumentException('Invalid argument for SELECT method. Columns must be an array or a comma-separated string.');
         }
 
         if (is_array($columns)) {
@@ -183,10 +184,10 @@ class NattiQueryBuilder
         return $this->join($table, $onClause, 'OUTER');
     }
 
-    public function get($data_type = 'assoc')
+    public function get($data_type = 'object')
     {
         try {
-            $this->query = $this->query . ' ' . implode(' ', $this->joinClauses);
+            $this->query = $this->query . '' . implode(' ', $this->joinClauses);
             $stm = $this->connection->prepare($this->query);
 
             foreach ($this->bindValues as $param => $value) {
@@ -197,8 +198,10 @@ class NattiQueryBuilder
 
             if ($data_type === 'object') {
                 return $stm->fetchAll(PDO::FETCH_OBJ);
-            } else {
+            } elseif ($data_type === 'assoc') {
                 return $stm->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                return $stm->fetchAll(PDO::FETCH_CLASS);
             }
         } catch (PDOException $e) {
             // Handle database error, e.g., log or throw an exception
