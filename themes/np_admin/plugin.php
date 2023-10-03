@@ -15,7 +15,7 @@ add_action('before_controller', function () {
 
 	$users = new Users();
 
-	$res = $users->findById(1);
+	$res = $users->find();
 
-	dd($res);
+	dd($res->get());
 });

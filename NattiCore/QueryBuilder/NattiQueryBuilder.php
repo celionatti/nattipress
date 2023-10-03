@@ -68,6 +68,44 @@ class NattiQueryBuilder
         return $this;
     }
 
+    public function update(array $data)
+    {
+        if (empty($data)) {
+            throw new \InvalidArgumentException('Invalid argument for UPDATE method. Data array must not be empty.');
+        }
+
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. UPDATE should come before other query building methods.');
+        }
+
+        $set = [];
+        foreach ($data as $column => $value) {
+            if (!is_string($column) || empty($column)) {
+                throw new \InvalidArgumentException('Invalid argument for UPDATE method. Column names must be non-empty strings.');
+            }
+
+            $set[] = "$column = :$column";
+            $this->bindValues[":$column"] = $value;
+        }
+
+        $this->query = "UPDATE $this->table SET " . implode(', ', $set);
+        $this->currentStep = 'update';
+
+        return $this;
+    }
+
+    public function delete()
+    {
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. DELETE should come before other query building methods.');
+        }
+
+        $this->query = "DELETE FROM $this->table";
+        $this->currentStep = 'delete';
+
+        return $this;
+    }
+
     public function where(array $conditions)
     {
         if ($this->currentStep !== 'select' && $this->currentStep !== 'where') {
@@ -183,6 +221,154 @@ class NattiQueryBuilder
     {
         return $this->join($table, $onClause, 'OUTER');
     }
+
+    public function count()
+    {
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. COUNT should come before other query building methods.');
+        }
+
+        $this->query = "SELECT COUNT(*) AS count FROM $this->table";
+        $this->currentStep = 'count';
+
+        return $this;
+    }
+
+    public function distinct($columns = '*')
+    {
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. DISTINCT should come before other query building methods.');
+        }
+
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+
+        $columns = implode(', ', $columns);
+        $this->query = "SELECT DISTINCT $columns FROM $this->table";
+        $this->currentStep = 'distinct';
+
+        return $this;
+    }
+
+    public function truncate()
+    {
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. TRUNCATE should come before other query building methods.');
+        }
+
+        $this->query = "TRUNCATE TABLE $this->table";
+        $this->currentStep = 'truncate';
+
+        return $this;
+    }
+
+    // public function union(NattiQueryBuilder ...$queries)
+    // {
+    //     if ($this->currentStep !== 'initial') {
+    //         throw new \Exception('Invalid method order. UNION should come before other query building methods.');
+    //     }
+
+    //     $queryStrings = [$this->query];
+    //     foreach ($queries as $query) {
+    //         $queryStrings[] = $query->getQuery();
+    //     }
+
+    //     $this->query = implode(' UNION ', $queryStrings);
+    //     $this->currentStep = 'union';
+
+    //     return $this;
+    // }
+
+    public function union(NattiQueryBuilder ...$queries)
+    {
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. UNION should come before other query building methods.');
+        }
+
+        // Store the current query and reset it
+        $currentQuery = $this->query;
+        $this->query = '';
+
+        $queryStrings = [$currentQuery];
+        foreach ($queries as $query) {
+            $queryStrings[] = $query->query; // Assuming your query property is called "query"
+        }
+
+        $this->query = implode(' UNION ', $queryStrings);
+        $this->currentStep = 'union';
+
+        return $this;
+    }
+
+
+    public function rawQuery(string $sql, array $bindValues = [])
+    {
+        if ($this->currentStep !== 'initial') {
+            throw new \Exception('Invalid method order. Raw query should come before other query building methods.');
+        }
+
+        $this->query = $sql;
+        $this->bindValues = $bindValues;
+        $this->currentStep = 'raw';
+
+        return $this;
+    }
+
+    public function alias(string $alias)
+    {
+        if ($this->currentStep === 'initial') {
+            throw new \Exception('Invalid method order. Alias should come after other query building methods.');
+        }
+
+        $this->query .= " AS $alias";
+
+        return $this;
+    }
+
+    public function subquery(NattiQueryBuilder $subquery, string $alias)
+    {
+        if ($this->currentStep === 'initial') {
+            throw new \Exception('Invalid method order. Subquery should come after other query building methods.');
+        }
+
+        $this->query .= " ($subquery) AS $alias";
+
+        return $this;
+    }
+
+    public function between(string $column, $value1, $value2)
+    {
+        if ($this->currentStep !== 'select' && $this->currentStep !== 'where') {
+            throw new \Exception('Invalid method order. BETWEEN should come after SELECT, WHERE, or a previous BETWEEN.');
+        }
+
+        $this->query .= " AND $column BETWEEN :value1 AND :value2";
+        $this->bindValues[':value1'] = $value1;
+        $this->bindValues[':value2'] = $value2;
+
+        $this->currentStep = 'between';
+
+        return $this;
+    }
+
+    public function having(array $conditions)
+    {
+        if ($this->currentStep !== 'group') {
+            throw new \Exception('Invalid method order. HAVING should come after GROUP BY.');
+        }
+
+        $having = [];
+        foreach ($conditions as $column => $value) {
+            $having[] = "$column = :$column";
+            $this->bindValues[":$column"] = $value;
+        }
+
+        $this->query .= " HAVING " . implode(' AND ', $having);
+
+        return $this;
+    }
+
 
     public function get($data_type = 'object')
     {

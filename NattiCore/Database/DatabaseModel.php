@@ -33,10 +33,10 @@ use NattiPress\NattiCore\QueryBuilder\NattiQueryBuilder;
         $this->queryBuilder = $this->db->queryBuilder($this->tableName);
     }
 
-    public function find()
+    public function find($column = "*")
     {
         return $this->queryBuilder
-            ->select();
+            ->select($column);
     }
 
     public function findById($id)
