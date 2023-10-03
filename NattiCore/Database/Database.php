@@ -25,6 +25,8 @@ class Database
     private $connection;
     private $transactionLevel = 0;
 
+    private static $instance;
+
     public function __construct()
     {
         $this->connect();
@@ -52,6 +54,15 @@ class Database
         }
 
         $this->connection = $con;
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
     public function beginTransaction()
