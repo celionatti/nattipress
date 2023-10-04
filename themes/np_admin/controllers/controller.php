@@ -6,3 +6,5 @@ declare(strict_types=1);
 namespace NattiThemes\np_\models;
 
 /**put the controller code for your plugin here**/
+
+dd(get_value('table'));

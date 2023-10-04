@@ -10,7 +10,7 @@ class Request
 
     public function getPath()
     {
-        $path = $_SERVER['REQUEST_URI'] ?? '/';
+        $path = $_SERVER['REQUEST_URI'] ?? 'home';
         $position = strpos($path, '?');
         if ($position === false) {
             return $path;
@@ -49,51 +49,56 @@ class Request
     }
 
     /**
-     * get a value from the GET variable
-     *
-     */
-    public function get(string $key = '', mixed $default = ''): mixed
-    {
-
-        if (empty($key)) {
-            return $this->esc($_GET);
-        } elseif (isset($_GET[$key])) {
-            return $this->esc($_GET[$key]);
-        }
-
-        return $this->esc($default);
-    }
-
-    /**
      * get a value from the POST variable
      *
      */
-    public function post(string $key = '', mixed $default = ''): mixed
+    public function post(string $key, string $default = ''): string
     {
+        if (!empty($_POST[$key]))
+            return $_POST[$key];
 
-        if (empty($key)) {
-            return $this->esc($_POST);
-        } elseif (isset($_POST[$key])) {
-            return $this->esc($_POST[$key]);
-        }
+        return $default;
+    }
 
-        return $this->esc($default);
+    /**
+     * get a value from the GET variable
+     *
+     */
+    public function get(string $key = ''): string
+    {
+        if (empty($key))
+            return $_GET;
+
+        if (!empty($_GET[$key]))
+            return $_GET[$key];
+
+        return '';
     }
 
     /**
      * get a value from the FILES variable
      *
      */
-    public function files(string $key = '', mixed $default = ''): mixed
+    public function files(string $key = ''): string|array
     {
-
-        if (empty($key)) {
+        if (empty($key))
             return $_FILES;
-        } elseif (isset($_FILES[$key])) {
-            return $_FILES[$key];
-        }
 
-        return $default;
+        if (!empty($_FILES[$key]))
+            return $_FILES[$key];
+
+        return '';
+    }
+
+    public function all(string $key = ''): string|array
+    {
+        if (empty($key))
+            return $_REQUEST;
+
+        if (!empty($_REQUEST[$key]))
+            return $_REQUEST[$key];
+
+        return '';
     }
 
     public function getBody(): array
@@ -153,5 +158,4 @@ class Request
     {
         return $this->params[$param] ?? $default;
     }
-
 }

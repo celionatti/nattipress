@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace NattiPress\NattiCore;
 
-use NattiPress\NattiCore\Http\Request;
-use NattiPress\NattiCore\Http\Response;
-
 /**
  * NattiPress Class.
  */
@@ -14,10 +11,6 @@ use NattiPress\NattiCore\Http\Response;
 
 class NattiPress
 {
-    public Request $request;
-    public Response $response;
-    public Router $router;
-
     public function __construct()
     {
         // Load plugins folders.
