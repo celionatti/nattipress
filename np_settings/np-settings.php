@@ -59,8 +59,8 @@ np_initial_constants();
 // Register the shutdown handler for fatal errors as soon as possible.
 // np_register_fatal_error_handler();
 
-// WordPress calculates offsets from UTC.
-// phpcs:ignore WordPress.DateTime.RestrictedFunctions.timezone_change_date_default_timezone_set
+// NattiPress calculates offsets from UTC.
+// phpcs:ignore NattiPress.DateTime.RestrictedFunctions.timezone_change_date_default_timezone_set
 date_default_timezone_set( 'UTC' );
 
 // Standardize $_SERVER variables across setups.

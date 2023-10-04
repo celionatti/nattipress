@@ -489,3 +489,30 @@ function verify_csrf_token($token, $name = 'csrf_token', $expiration = 3600)
 
     throw new Exception("CSRF token verification failed.");
 }
+
+function get_stylesheet_directory($style_file) {
+    // Replace this with the actual path to your stylesheet directory
+    $stylesheet_directory = "/assets/css/{$style_file}";
+
+    // Get the base URL of the current script
+    $base_url = NP_ROOT;
+
+    // Construct and return the stylesheet directory URI
+    $stylesheet_uri = $base_url . $stylesheet_directory;
+
+    return $stylesheet_uri;
+}
+
+function get_script_directory($script_file) {
+    // Replace this with the actual path to your js directory
+    $script_directory = "/assets/js/{$script_file}";
+
+    // Get the base URL of the current script
+    $base_url = NP_ROOT;
+
+    // Construct and return the js directory URI
+    $script_uri = $base_url . $script_directory;
+
+    return $script_uri;
+}
+

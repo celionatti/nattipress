@@ -39,7 +39,7 @@ class NattiPress
         $before_content = ob_get_contents();
         do_action('view');
         $after_content = ob_get_contents();
-
+        
         if (strlen($after_content) == strlen($before_content)) {
             if (page() != 'not-found') {
                 redirect('not-found');

@@ -112,7 +112,7 @@ function np_initial_constants() {
 	// non-concatenated scripts and stylesheets.
 	if ( ! defined( 'SCRIPT_DEBUG' ) ) {
 		if ( ! empty( $np_version ) ) {
-			$develop_src = false !== strpos( $np_version, '-src' );
+			$develop_src = false !== strpos( $np_version, '-assets' );
 		} else {
 			$develop_src = false;
 		}

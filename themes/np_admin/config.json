@@ -1,14 +1,14 @@
 {
-	"name":"New Plugin",
+	"name":"NattiPress Admin",
 	"version":"1.0.0",
-	"id":"new-plugin",
-	"author":"",
+	"id":"np-admin",
+	"author":"celio natti",
 	"author website":"",
 	"thumbnail":"thumbnail.jpg",
-	"active":true,
+	"active":false,
 	"index":1,
 	"routes": {
-		"on":["all"],
+		"on":["admin"],
 		"off":[]
 	},
 	"dependencies": {

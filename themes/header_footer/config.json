@@ -1,15 +1,15 @@
 {
-	"name":"NattiPress Auth",
+	"name":"Header Footer",
 	"version":"1.0.0",
-	"id":"np-auth",
+	"id":"header-footer",
 	"author":"celio natti",
 	"author website":"",
 	"thumbnail":"thumbnail.jpg",
-	"active":false,
+	"active":true,
 	"index":1,
 	"routes": {
 		"on":["all"],
-		"off":[]
+		"off":["admin"]
 	},
 	"dependencies": {
 

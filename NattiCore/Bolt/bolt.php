@@ -291,7 +291,7 @@ class Bolt
 
     private function message(string $message, bool $die = false): void
     {
-        echo "\n\r" . ucfirst($message);
+        echo "\n\r" . "[" . date("Y-m-d H:i:s") . "] - " . ucfirst($message) . PHP_EOL;
         ob_flush();
 
         if ($die) return;

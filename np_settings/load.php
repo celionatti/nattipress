@@ -200,10 +200,10 @@ function np_get_environment_type()
 	if (defined('NP_ENVIRONMENT_TYPES')) {
 		$message = sprintf('The %s constant is no longer supported.', 'NP_ENVIRONMENT_TYPES');
 
-		dd(
+		np_die(
 			'define()',
-			'5.5.1',
-			$message
+			$message,
+			'5.5.1'
 		);
 	}
 

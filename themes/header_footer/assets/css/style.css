@@ -1,0 +1,12 @@
+/**
+ * Put the Css for your Plugin Themes.
+ */
+
+*{
+	box-sizing: border-box;
+}
+
+body{
+	font-family: tahoma;
+	background-color: red;
+}
