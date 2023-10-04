@@ -21,6 +21,8 @@ class Bolt
             $original_folder = $folder;
             $folder = 'themes/' . $folder;
 
+            $folder = str_replace("-", "_", $folder);
+
             if (file_exists($folder))
                 $this->message("That plugin folder already exists", true);
 

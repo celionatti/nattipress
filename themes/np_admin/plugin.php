@@ -2,20 +2,59 @@
 
 declare(strict_types=1);
 
-use NattiThemes\np_admin\models\Users;
+/**
+ * Plugin name: 
+ * Description: 
+ * 
+ * 
+ **/
 
 set_value([
 
-	'plugin_route'	=> 'admin',
-	'logout_page'	=> 'logout',
+	'plugin_route'	=>'my-plugin',
+	'table'			=>'my_table',
 
 ]);
 
-add_action('before_controller', function () {
+/** set user permissions for this plugin **/
+add_filter('permissions',function($permissions){
 
-	$users = new Users();
+	$permissions[] = 'my_permission';
 
-	$res = $users->find();
+	return $permissions;
+});
 
-	dd($res->get_query());
+
+/** run this after a form submit **/
+add_action('controller',function(){
+
+	$vars = get_value();
+
+	require plugin_path('controllers/controller.php');
+});
+
+
+/** displays the view file **/
+add_action('view',function(){
+
+	$vars = get_value();
+
+	require plugin_path('views/view.php');
+});
+
+
+/** for manipulating data after a query operation **/
+add_filter('after_query',function($data){
+
+	
+	if(empty($data['result']))
+		return $data;
+
+	foreach ($data['result'] as $key => $row) {
+		
+
+
+	}
+
+	return $data;
 });

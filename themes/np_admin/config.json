@@ -1,8 +1,8 @@
 {
-	"name":"NattiPress Admin",
+	"name":"New Plugin",
 	"version":"1.0.0",
-	"id":"np-admin",
-	"author":"Celio Natti",
+	"id":"new-plugin",
+	"author":"",
 	"author website":"",
 	"thumbnail":"thumbnail.jpg",
 	"active":true,

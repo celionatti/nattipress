@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
+namespace NattiThemes\np_{CLASS_NAME}\models;
+
 defined('FCPATH') or die("Direct script access denied");
 
-namespace NattiThemes\np_{NAMESPACE}\models;
 
 use NattiPress\NattiCore\Database\DatabaseModel;
 
