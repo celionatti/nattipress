@@ -1,15 +1,14 @@
 <?php
 
-declare(strict_types=1);
+namespace Migration;
 
-namespace NattiPress\NattiCore\Database\Migration;
+defined('FCPATH') or die("Direct script access denied");
 
-use NattiPress\NattiCore\Database\Database;
+use \Core\Database;
 
 /**
- * Migration Class
+ * Migration class
  */
-
 class Migration extends Database
 {
     private $columns = [];
@@ -34,7 +33,7 @@ class Migration extends Database
 
             $query = trim($query, ",");
 
-            $query .= ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4";
+            $query .= ") ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4";
 
             $this->query($query);
 
@@ -87,13 +86,6 @@ class Migration extends Database
         }, $enumValues));
 
         $this->addColumn("$columnName ENUM($enumValuesStr)");
-        return $this; // Return $this to enable method chaining
-    }
-
-    public function tinyint(string $columnName)
-    {
-        // Add a TINYINT column
-        $this->addColumn("$columnName TINYINT");
         return $this; // Return $this to enable method chaining
     }
 
@@ -176,3 +168,25 @@ class Migration extends Database
         return $this; // Return $this to enable method chaining
     }
 }
+
+
+
+/**
+ * Usage
+ */
+
+ $migration = new \Migration\Migration();
+
+ // Create a table with columns and indexes
+ $migration->createTable('users')
+     ->int('id')->autoIncrement()->addPrimaryKey()
+     ->varchar('username', 50)->nullable()
+     ->varchar('email', 100)->addUniqueIndex('email')
+     ->insert([
+         ['username' => 'john_doe', 'email' => 'john@example.com'],
+         ['username' => 'jane_doe', 'email' => 'jane@example.com'],
+     ]);
+ 
+ // Drop a table
+ $migration->dropTable('temp_table');
+ 

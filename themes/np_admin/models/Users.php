@@ -14,4 +14,9 @@ class Users extends DatabaseModel
     {
         return "users";
     }
+
+    public function allUsers()
+    {
+        return $this->query("select * from users");
+    }
 }

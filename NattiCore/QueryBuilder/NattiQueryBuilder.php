@@ -21,6 +21,7 @@ class NattiQueryBuilder
     private $bindValues = [];
     private $joinClauses = [];
     private $currentStep = 'initial';
+    public static $query_id = '';
 
     public function __construct($connection, $table)
     {
@@ -370,9 +371,35 @@ class NattiQueryBuilder
     }
 
 
+    // public function get($data_type = 'object')
+    // {
+    //     try {
+    //         $this->query = $this->query . '' . implode(' ', $this->joinClauses);
+    //         $stm = $this->connection->prepare($this->query);
+
+    //         foreach ($this->bindValues as $param => $value) {
+    //             $stm->bindValue($param, $value);
+    //         }
+
+    //         $stm->execute();
+
+    //         if ($data_type === 'object') {
+    //             return $stm->fetchAll(PDO::FETCH_OBJ);
+    //         } elseif ($data_type === 'assoc') {
+    //             return $stm->fetchAll(PDO::FETCH_ASSOC);
+    //         } else {
+    //             return $stm->fetchAll(PDO::FETCH_CLASS);
+    //         }
+    //     } catch (PDOException $e) {
+    //         // Handle database error, e.g., log or throw an exception
+    //         throw new DatabaseException($e->getMessage());
+    //     }
+    // }
+
     public function get($data_type = 'object')
     {
         try {
+            $this->connection->beginTransaction();
             $this->query = $this->query . '' . implode(' ', $this->joinClauses);
             $stm = $this->connection->prepare($this->query);
 
@@ -389,6 +416,78 @@ class NattiQueryBuilder
             } else {
                 return $stm->fetchAll(PDO::FETCH_CLASS);
             }
+            // Commit the transaction if the query was successful
+            $this->connection->commitTransaction();
+        } catch (PDOException $e) {
+            // Rollback the transaction on error
+            $this->connection->rollbackTransaction();
+            // Handle database error, e.g., log or throw an exception
+            throw new DatabaseException($e->getMessage());
+        }
+    }
+
+    public function get_query($data_type = 'object')
+    {
+        $this->query = do_filter('before_query_query', $this->query);
+        $this->bindValues = do_filter('before_query_data', $this->bindValues);
+
+        $this->connection->error = '';
+        $this->connection->has_error = false;
+
+        try {
+            $this->connection->beginTransaction();
+            $this->query = $this->query . '' . implode(' ', $this->joinClauses);
+            $stm = $this->connection->prepare($this->query);
+
+            foreach ($this->bindValues as $param => $value) {
+                $stm->bindValue($param, $value);
+            }
+
+            $result = $stm->execute();
+
+            $this->connection->affected_rows = $stm->rowCount();
+            $this->connection->insert_id = $this->connection->lastInsertId();
+
+            if ($result) {
+                if ($data_type === 'object') {
+                    $rows = $stm->fetchAll(PDO::FETCH_OBJ);
+                } elseif ($data_type === 'assoc') {
+                    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+                } else {
+                    $rows = $stm->fetchAll(PDO::FETCH_CLASS);
+                }
+            }
+            // Commit the transaction if the query was successful
+            $this->connection->commit();
+        } catch (PDOException $e) {
+            // Rollback the transaction on error
+            $this->connection->rollback();
+            $this->connection->error = $e->getMessage();
+            $this->connection->has_error = true;
+        }
+
+        $arr = [];
+        $arr['query'] = $this->query;
+        $arr['data'] = $this->bindValues;
+        $arr['result'] = $rows ?? [];
+        $arr['query_id'] = self::$query_id;
+        self::$query_id = '';
+
+        $result = do_filter('after_query', $arr);
+
+        if (is_array($result['result']) && count($result['result']) > 0) {
+            return $result['result'];
+        }
+
+        return false;
+    }
+
+    public function executeQuery()
+    {
+        try {
+            $this->query = $this->query . '' . implode(' ', $this->joinClauses);
+            $result = $this->connection->query($this->query, $this->bindValues);
+            return $result;
         } catch (PDOException $e) {
             // Handle database error, e.g., log or throw an exception
             throw new DatabaseException($e->getMessage());

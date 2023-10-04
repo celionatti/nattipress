@@ -17,5 +17,5 @@ add_action('before_controller', function () {
 
 	$res = $users->find();
 
-	dd($res->get());
+	dd($res->get_query());
 });

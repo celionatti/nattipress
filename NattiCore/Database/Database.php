@@ -23,7 +23,7 @@ class Database
     public $missing_tables = [];
 
     private $connection;
-    private $transactionLevel = 0;
+    public $transactionLevel = 0;
 
     private static $instance;
 
@@ -152,8 +152,10 @@ class Database
             if ($result) {
                 if ($data_type == 'object') {
                     $rows = $stm->fetchAll(PDO::FETCH_OBJ);
-                } else {
+                } elseif ($data_type == 'assoc') {
                     $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+                } else {
+                    $rows = $stm->fetchAll(PDO::FETCH_CLASS);
                 }
             }
             // Commit the transaction if the query was successful
