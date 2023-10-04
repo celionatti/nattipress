@@ -279,3 +279,213 @@ function redirect($url, $status_code = 302, $headers = [], $query_params = [], $
         exit();
     }
 }
+
+function old_value(string $key, $default = '', string $type = 'post', string $dataType = 'string'): mixed
+{
+    // Define the input sources and their corresponding arrays
+    $sources = [
+        'post' => $_POST,
+        'get' => $_GET,
+        // Add more sources as needed (e.g., 'session', 'cookie', etc.)
+    ];
+
+    // Validate the input source
+    if (!array_key_exists($type, $sources)) {
+        throw new InvalidArgumentException("Invalid input source: $type");
+    }
+
+    // Get the value from the specified input source
+    $value = $sources[$type][$key] ?? $default;
+
+    // Cast the retrieved value to the specified data type
+    switch ($dataType) {
+        case 'int':
+            return (int)$value;
+        case 'float':
+            return (float)$value;
+        case 'bool':
+            return (bool)$value;
+        case 'array':
+            if (!is_array($value)) {
+                return [$value];
+            }
+            return $value;
+        case 'string':
+        default:
+            return (string)$value;
+    }
+}
+
+function old_select(string $key, string $value, $default = '', string $type = 'post', bool $strict = true): string
+{
+    // Define the input sources and their corresponding arrays
+    $sources = [
+        'post' => $_POST,
+        'get' => $_GET,
+        // Add more sources as needed (e.g., 'session', 'cookie', etc.)
+    ];
+
+    // Validate the input source
+    if (!array_key_exists($type, $sources)) {
+        throw new InvalidArgumentException("Invalid input source: $type");
+    }
+
+    // Get the value from the specified input source
+    $inputValue = $sources[$type][$key] ?? '';
+
+    // Determine if the selected value matches the input value
+    $isSelected = ($strict ? $inputValue === $value : $inputValue == $value) || ($default == $value);
+
+    return $isSelected ? 'selected' : '';
+}
+
+function old_checked(string $key, string $value, $default = '', string $type = 'post', bool $strict = true): string
+{
+    // Define the input sources and their corresponding arrays
+    $sources = [
+        'post' => $_POST,
+        'get' => $_GET,
+        // Add more sources as needed (e.g., 'session', 'cookie', etc.)
+    ];
+
+    // Validate the input source
+    if (!array_key_exists($type, $sources)) {
+        throw new InvalidArgumentException("Invalid input source: $type");
+    }
+
+    // Get the value from the specified input source
+    $inputValue = $sources[$type][$key] ?? '';
+
+    // Determine if the checked value matches the input value
+    $isChecked = ($strict ? $inputValue === $value : $inputValue == $value) || ($default == $value);
+
+    return $isChecked ? 'checked' : '';
+}
+
+
+function get_image(?string $path = null, string $type = 'post'): string
+{
+    $defaultImageMap = [
+        'post' => '/assets/images/no_image.jpg',
+        'male' => '/assets/images/user_male.jpg',
+        'female' => '/assets/images/user_female.jpg',
+    ];
+
+    $path = $path ?? '';
+
+    if (!empty($path) && file_exists($path)) {
+        return NP_ROOT . '/' . $path;
+    }
+
+    if (array_key_exists($type, $defaultImageMap)) {
+        return NP_ROOT . $defaultImageMap[$type];
+    }
+
+    return NP_ROOT . $defaultImageMap['post'];
+}
+
+function get_date(?string $date = null, string $format = "jS M, Y", string $timezone = "UTC"): string
+{
+    $date = $date ?? '';
+
+    if (empty($date)) {
+        return '';
+    }
+
+    $timestamp = strtotime($date);
+
+    if ($timestamp === false) {
+        return 'Invalid Date';
+    }
+
+    $dateTime = new DateTime();
+    $dateTime->setTimestamp($timestamp);
+    $dateTime->setTimezone(new DateTimeZone($timezone));
+
+    return $dateTime->format($format);
+}
+
+// function csrf_token($name = 'csrf_token', $expiration = 3600, $tokenLength = 32) {
+//     // Generate a CSRF token if one doesn't exist
+//     if (!isset($_SESSION[$name])) {
+//         $_SESSION[$name] = bin2hex(random_bytes($tokenLength));
+//         $_SESSION[$name . '_timestamp'] = time();
+//     }
+
+//     // Check if the token has expired
+//     if (time() - $_SESSION[$name . '_timestamp'] > $expiration) {
+//         unset($_SESSION[$name]);
+//         unset($_SESSION[$name . '_timestamp']);
+//         return false;
+//     }
+
+//     return $_SESSION[$name];
+// }
+
+// function verify_csrf_token($token, $name = 'csrf_token', $expiration = 3600) {
+//     if (!isset($_SESSION[$name]) || !isset($_SESSION[$name . '_timestamp'])) {
+//         return false;
+//     }
+
+//     // Check if the token has expired
+//     if (time() - $_SESSION[$name . '_timestamp'] > $expiration) {
+//         unset($_SESSION[$name]);
+//         unset($_SESSION[$name . '_timestamp']);
+//         return false;
+//     }
+
+//     if ($token === $_SESSION[$name]) {
+//         // Remove the token to prevent reuse
+//         unset($_SESSION[$name]);
+//         unset($_SESSION[$name . '_timestamp']);
+//         return true;
+//     }
+
+//     return false;
+// }
+
+function csrf_token($name = 'csrf_token', $expiration = 3600, $tokenLength = 32)
+{
+    // Generate a CSRF token if one doesn't exist
+    if (!isset($_SESSION[$name])) {
+        $_SESSION[$name] = bin2hex(random_bytes($tokenLength));
+        $_SESSION[$name . '_timestamp'] = time();
+    }
+
+    // Check if the token has expired
+    if (time() - $_SESSION[$name . '_timestamp'] > $expiration) {
+        unset($_SESSION[$name]);
+        unset($_SESSION[$name . '_timestamp']);
+        return false;
+    }
+
+    return $_SESSION[$name];
+}
+
+function require_csrf_token($name = 'csrf_token', $expiration = 3600)
+{
+    if (!isset($_SESSION[$name]) || !isset($_SESSION[$name . '_timestamp'])) {
+        throw new Exception("CSRF token is missing or expired.");
+    }
+
+    // Check if the token has expired
+    if (time() - $_SESSION[$name . '_timestamp'] > $expiration) {
+        unset($_SESSION[$name]);
+        unset($_SESSION[$name . '_timestamp']);
+        throw new Exception("CSRF token has expired.");
+    }
+}
+
+function verify_csrf_token($token, $name = 'csrf_token', $expiration = 3600)
+{
+    require_csrf_token($name, $expiration);
+
+    if ($token === $_SESSION[$name]) {
+        // Remove the token to prevent reuse
+        unset($_SESSION[$name]);
+        unset($_SESSION[$name . '_timestamp']);
+        return true;
+    }
+
+    throw new Exception("CSRF token verification failed.");
+}
